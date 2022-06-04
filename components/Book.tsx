@@ -27,34 +27,25 @@ const StyledBook = styled(Link)`
   row-gap: 1em;
   justify-content: center;
   width: 100%;
+  transition: all 0.2s ease-in;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  row-gap: 15px;
 `
 
 const H4 = styled.h4`
   text-align: center;
 `
 
-
 const Book: React.FC<BookProps> = (props) => {
-  const StyledLink = styled.a`
-    transition: all 0.2s ease-in;
-    position: relative;
-    display: flex;
-    flex-direction: column;
-    row-gap: 15px;
-    
-    &:hover {
-      cursor: pointer;
-      transform: scale(1.1);
-    }
-  `
-  
   return (
     <StyledBook href={`/books/${props.id}`}>
-      <StyledLink>
+      <a>
         <StyledImage src={`https://covers.openlibrary.org/b/id/${props.coverID}-L.jpg`} alt={`Cover image for '${props.title}'`} width={300} height={300} />
         
         <H4>{ props.title }</H4>
-      </StyledLink>
+      </a>
     </StyledBook>
   )
 }

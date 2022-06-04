@@ -1,7 +1,6 @@
 import { GetStaticPaths, GetStaticProps } from "next";
-import Image from "next/image";
 import styled from "styled-components";
-import Book, { IBook } from "../../components/Book";
+import { IBook } from "../../components/Book";
 import Wrapper from "../../components/Wrapper";
 
 interface BookDisplayProps {
@@ -34,10 +33,11 @@ const BookDisplay: React.FC<BookDisplayProps> = ({ book }) => {
       <h2>{ book.title }</h2>
       <StyledBook>
         <StyledImage src={`https://covers.openlibrary.org/b/id/${book.coverID}-L.jpg`} alt={`Cover image for '${book.title}'`} />
-        
         <section>
           <p>By <b>{book.author}</b></p>
-          <p><b>First publish:</b> {book.firstPublishDate}</p>
+          { book.firstPublishDate &&
+            <p><b>First publish:</b> {book.firstPublishDate}</p>
+          }
           <p><b>Subjects:</b> { book.subjects?.slice(0, 10).join(', ') }</p>
         </section>
       </StyledBook>
@@ -49,13 +49,13 @@ export const getStaticPaths: GetStaticPaths = async () => {
   const response = await fetch('https://openlibrary.org/search.json?q=subject%3Aweb+development');
   const results = await response.json();
 
-  const ids: string[] = results.docs.slice(0, 100).filter(work => !!work.cover_i && !!work.author_name).map(work => 
+  const ids = results.docs.slice(0, 10).filter((work: any) => !!work.cover_i && !!work.author_name).map((work: any) => 
     ({
       id: work.key.replace('/works/', ''),
     })
   );
   
-  const paths = ids.map(id => ({ params: { id: `${id}` } }))
+  const paths = ids.map((id: {id: string}) => ({ params: { id: `${id.id}` } }))
   
   return {
     paths,
@@ -64,7 +64,7 @@ export const getStaticPaths: GetStaticPaths = async () => {
 }
 
 export const getStaticProps: GetStaticProps = async ({ params }) => {
-  const id = params.id;
+  const id = params?.id;
   
   const response = await fetch(`https://openlibrary.org/works/${id}.json`);
   const result = await response.json();
@@ -76,8 +76,8 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
     coverID: result.covers[0],
     title: result.title,
     author: author.name,
-    id: id,
-    firstPublishDate: result.first_publish_date,
+    id: id ?? result.key.replace('/works/', ''),
+    firstPublishDate: result.first_publish_date ?? '',
     subjects: result.subjects,
   }
   

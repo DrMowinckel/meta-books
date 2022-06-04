@@ -77,7 +77,7 @@ export const getStaticProps: GetStaticProps = async (context) => {
   const response = await fetch('https://openlibrary.org/search.json?q=subject%3Aweb+development');
   const results = await response.json();
 
-  const books = results.docs.slice(0, 100).filter(work => !!work.cover_i && !!work.author_name).map(work => 
+  const books = results.docs.slice(0, 100).filter((work: any) => !!work.cover_i && !!work.author_name).map((work: any) => 
     ({
       coverID: work.cover_i,
       title: work.title,
